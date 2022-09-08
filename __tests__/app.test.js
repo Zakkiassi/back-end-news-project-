@@ -47,7 +47,7 @@ describe("GET /api/articles/:article_id", () => {
       .then((res) => {
         const { body } = res;
         console.log(body);
-        expect(body.article[0]).toEqual({
+        expect(body.article).toEqual({
           article_id: 1,
           title: "Living in the shadow of a great man",
           topic: "mitch",
@@ -60,12 +60,42 @@ describe("GET /api/articles/:article_id", () => {
   });
   test("status:404, respond with error message", () => {
     return request(app)
-      .get("/api/article/500")
+      .get("/api/articles/1002")
       .expect(404)
       .then(({ body }) => {
         console.log(body);
         const { msg } = body;
-        expect(msg).toBe("file not found");
+        expect(msg).toBe("No article found");
+      });
+  });
+  test("status:400, responds with an error message when passed a bad user ID", () => {
+    return request(app)
+      .get("/api/articles/notAnID")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("bad request");
+      });
+  });
+});
+
+describe("GET /api/users", () => {
+  test("200: returns an array of users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then((res) => {
+        const { body } = res;
+        expect(Array.isArray(body.users)).toBe(true);
+        body.users.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            })
+          );
+          expect(Object.keys(user).length).toBe(3);
+        });
       });
   });
 });
