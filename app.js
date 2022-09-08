@@ -1,6 +1,10 @@
 const { getTopics } = require("./controllers/topics.controllers");
-const { getArticles } = require("./controllers/articles.controllers");
+const {
+  getArticles,
+  patchArticleById,
+} = require("./controllers/articles.controllers");
 const { getAllUsers } = require("./controllers/users.contollers");
+
 const express = require("express");
 const app = express();
 app.use(express.json());
@@ -9,10 +13,11 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles/:article_id", getArticles);
 
 app.get("/api/users", getAllUsers);
+app.patch("/api/articles/:article_id", patchArticleById);
 
 app.all("/*", (req, res, next) => {
   console.log("error handler");
-  res.status(404).send({ msg: "file not found" });
+  res.status(404).send({ msg: "file or articole not found" });
 });
 
 app.use((err, req, res, next) => {
@@ -25,12 +30,5 @@ app.use((err, req, res, next) => {
     res.status(500).send({ msg: "Internal Server Error" });
   }
 });
-
-// app.use((err, req, res, next) => {
-//   console.log("400 error handler");
-//   if (err.code === "22P02") {
-//     res.status(400).send({ msg: "bad request" });
-//   }
-// });
 
 module.exports = app;

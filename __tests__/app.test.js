@@ -13,7 +13,7 @@ describe("404 error", () => {
       .get("/api/nottopics")
       .expect(404)
       .then((res) => {
-        expect(res.body.msg).toBe("file not found");
+        expect(res.body.msg).toBe("file or articole not found");
       });
   });
 });
@@ -65,7 +65,7 @@ describe("GET /api/articles/:article_id", () => {
       .then(({ body }) => {
         console.log(body);
         const { msg } = body;
-        expect(msg).toBe("No article found");
+        expect(msg).toBe("file or articole not found");
       });
   });
   test("status:400, responds with an error message when passed a bad user ID", () => {
@@ -108,9 +108,9 @@ describe("GET /api/users", () => {
   });
 });
 
-describe.only("PATCH /api/articles/:article_id", () => {
+describe("PATCH /api/articles/:article_id", () => {
   const articleUpdate = {
-    inc_votes: 3,
+    votes: 3,
   };
   test("status:200, responds with the updated article", () => {
     return request(app)
@@ -124,9 +124,27 @@ describe.only("PATCH /api/articles/:article_id", () => {
           topic: "mitch",
           author: "butter_bridge",
           body: "I find this existence challenging",
-          created_at: 1594329060000,
-          votes: 100,
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 103,
         });
+      });
+  });
+  test("status:404, respond with error message", () => {
+    return request(app)
+      .get("/api/article/1000")
+      .expect(404)
+      .then(({ body }) => {
+        console.log(body);
+        const { msg } = body;
+        expect(msg).toBe("file or articole not found");
+      });
+  });
+  test("status:400, responds with an error message when passed a bad user ID", () => {
+    return request(app)
+      .get("/api/articles/notAnID")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("bad request");
       });
   });
 });
